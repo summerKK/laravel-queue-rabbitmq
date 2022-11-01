@@ -13,7 +13,7 @@ jobs:
       fail-fast: true
       matrix:
         php: ['7.3', '7.4']
-        stability: [prefer-lowest, prefer-stable]
+        stability: [prefer-stable]
 
     name: PHP ${{ matrix.php }} - ${{ matrix.stability }}
 
@@ -37,8 +37,13 @@ jobs:
       - name: Start Docker container
         run: docker-compose up -d rabbitmq
 
+      - name: docker ps
+        run: docker-compose ps
+
       - name: Install dependencies
-        run: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress
+        run: |
+          composer config --no-plugins allow-plugins.kylekatarnls/update-helper true
+          composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress
 
       - name: Execute tests
         run: vendor/bin/phpunit --verbose
